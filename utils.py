@@ -17,6 +17,10 @@ async def get_profile(tg_id):
         f"<b>Номер телефона:</b> {res['phone'] if res['phone'] != None else text.no_profile_data}"
     return data
 
+async def check_is_contractor(tg_id):
+    res = await ManageDB().get_profile_info(tg_id)
+    return res['is_contractor']
+
 async def set_profile(tg_id, first_name=None, last_name=None, gender=None, email=None, address=None, phone=None):
     data = {
         'first_name': first_name,

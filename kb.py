@@ -29,6 +29,7 @@ def get_menu_keyboard() -> InlineKeyboardMarkup:
     menu = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="Профиль", callback_data="show_profile"),
+            InlineKeyboardButton(text="Профиль художника", callback_data="show_contractor_profile"),
             InlineKeyboardButton(text="Список заказов", callback_data="show_order_list")
         ]
     ])

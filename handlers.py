@@ -10,12 +10,21 @@ import utils
 import kb
 import text
 
+
 router = Router()
 
 @router.message(Command("start"))
 async def start_handler(msg: Message):
     await msg.answer(text.greet.format(name=html.bold(html.quote(msg.from_user.full_name))), reply_markup=kb.get_menu_keyboard())
     await utils.register(msg.from_user.id)
+
+@router.callback_query(F.data == "show_contractor_profile")
+async def show_contractor_profile_query(clbck:CallbackQuery, state: FSMContext):
+    constractor = await utils.check_is_contractor(clbck.from_user.id)
+    if not constractor:
+        await clbck.answer(text.no_contractor_message)
+        return
+    await clbck.answer('test')
 
 @router.callback_query(F.data == "show_profile")
 async def show_profile_query(clbck: CallbackQuery, state: FSMContext):
