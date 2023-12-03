@@ -38,7 +38,7 @@ def get_change_gender_keyboard() -> ReplyKeyboardMarkup:
     gender = ReplyKeyboardMarkup(keyboard=[
         [
             KeyboardButton(text="Мужской"),
-            KeyboardButton(text="Женкий")
+            KeyboardButton(text="Женcкий")
         ]
     ], resize_keyboard=True, input_field_placeholder="Выберите пол")
     return gender

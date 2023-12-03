@@ -14,7 +14,7 @@ router = Router()
 
 @router.message(Command("start"))
 async def start_handler(msg: Message):
-    await msg.answer(text.greet.format(name=html.bold(html.quote(msg.from_user.full_name))), reply_markup=kb.menu)
+    await msg.answer(text.greet.format(name=html.bold(html.quote(msg.from_user.full_name))), reply_markup=kb.get_menu_keyboard())
     await utils.register(msg.from_user.id)
 
 @router.callback_query(F.data == "show_profile")
@@ -66,8 +66,8 @@ async def set_last_name_state(msg: Message, state: FSMContext):
 
 @router.message(Gen.set_gender)
 async def set_gender_state(msg: Message, state: FSMContext):
-    if msg.text.lower() != 'мужской' and msg.text.lower() != 'женский':
-        msg.asnwer(f'Выберите из списка!')
+    if msg.text.lower() != 'мужской' and msg.text.lower() != 'женcкий':
+        msg.answer(f'Выберите из списка!')
         return
     await utils.set_profile(msg.from_user.id, gender=msg.text)
     await msg.answer(f'Пол изменен на {msg.text}', reply_markup=ReplyKeyboardRemove())
