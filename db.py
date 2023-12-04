@@ -42,12 +42,12 @@ class Database:
 class ManageDB:
     async def get_profile_info(self, tg_id):
         async with Database() as db:
-            res = await db.fetchrow(f"select * from users where tg_id = '{tg_id}'")
+            res = await db.fetchrow(f"SELECT * FROM users WHERE tg_id = '{tg_id}'")
         return res
     
     async def create_user(self, tg_id, *args):
         async with Database() as db:
-            await db.execute(f"insert into users (tg_id) values ('{tg_id}')")
+            await db.execute(f"INSERT INTO users (tg_id) VALUES ('{tg_id}')")
         
     async def set_profile_info(self, tg_id, data : dict):
         s = ''
@@ -55,8 +55,17 @@ class ManageDB:
             if value:
                 s += key + '=' + f"'{value}'"
         async with Database() as db:
-            await db.execute("update users set " + s + f" where tg_id='{tg_id}'")
-
+            await db.execute("UPDATE users SET " + s + f" WHERE tg_id='{tg_id}'")
+    
+    async def get_contractor_info(self, tg_id):
+        async with Database() as db:
+            res = await db.fetchrow(f"SELECT * FROM contractors JOIN users ON users.id=contractors.id WHERE users.tg_id='{tg_id}'")
+        return res
+    
+    async def register_contractor(self, tg_id):
+        async with Database() as db:
+            await db.execute(f"UPDATE users SET is_contractor=true WHERE tg_id='{tg_id}'")
+            await db.execute(f"INSERT INTO contractors(id) VALUES((SELECT id FROM users WHERE users.tg_id='{tg_id}'))")
         
 
 

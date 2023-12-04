@@ -22,9 +22,21 @@ async def start_handler(msg: Message):
 async def show_contractor_profile_query(clbck:CallbackQuery, state: FSMContext):
     constractor = await utils.check_is_contractor(clbck.from_user.id)
     if not constractor:
-        await clbck.answer(text.no_contractor_message)
-        return
-    await clbck.answer('test')
+        await clbck.message.answer(text.no_contractor_message, reply_markup=kb.get_yes_no_contractor_keyboard())
+        await clbck.answer()
+        return 
+    await clbck.message.answer('yes')
+
+@router.callback_query(F.data == "register_contractor")
+async def register_contractor_query(clbck: CallbackQuery, state: FSMContext):
+    await utils.register_contractor(clbck.from_user.id)
+    await clbck.message.answer("Учетная запись создана")
+    await clbck.answer()
+
+@router.callback_query(F.data == "show_contractor_profile")
+async def show_contractor_profile_query(clbck: CallbackQuery, state: FSMContext):
+    info = await utils.get_contractor_info(clbck.from_user.id)
+    clbck.message.answer(info)
 
 @router.callback_query(F.data == "show_profile")
 async def show_profile_query(clbck: CallbackQuery, state: FSMContext):
@@ -59,7 +71,7 @@ async def change_profile_data(clbck: CallbackQuery, state: FSMContext):
         case "change_profile_phone":
             await clbck.message.answer("Введите номер телефона")
             await state.set_state(Gen.set_phone)
-    clbck.answer()
+    await clbck.answer()
 
 @router.message(Gen.set_first_name)
 async def set_first_name_state(msg: Message, state: FSMContext):

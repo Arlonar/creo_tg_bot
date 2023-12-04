@@ -34,3 +34,11 @@ async def set_profile(tg_id, first_name=None, last_name=None, gender=None, email
 
 def get_address_from_coords(latitude, longitude):
     return Dadata(DADATA_API_KEY).geolocate(name="address", lat=latitude, lon=longitude),
+
+async def get_contractor_info(tg_id):
+    res = await ManageDB().get_contractor_info(tg_id)
+    data = f"Пока здесь больше ничего нет :)\n<b>ID<b>: {res['id']}"
+    return res
+
+async def register_contractor(tg_id):
+    await ManageDB().register_contractor(tg_id)

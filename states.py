@@ -9,3 +9,4 @@ class Gen(StatesGroup):
     set_phone = State()
 
     change_profile = State()
+    register_contractor = State()

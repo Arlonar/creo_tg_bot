@@ -48,4 +48,12 @@ def get_share_location_keyboard() -> ReplyKeyboardMarkup:
      return ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Поделиться местоположением", request_location=True)]],
                                  resize_keyboard=True, input_field_placeholder="Введите адрес доставки")
 
+def get_yes_no_contractor_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Да", callback_data="register_contractor"),
+            InlineKeyboardButton(text="Нет", callback_data="show_menu")
+        ]
+    ])
+
 exit_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="◀️ Выйти в меню")]], resize_keyboard=True)
