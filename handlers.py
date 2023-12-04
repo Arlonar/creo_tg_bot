@@ -25,7 +25,9 @@ async def show_contractor_profile_query(clbck:CallbackQuery, state: FSMContext):
         await clbck.message.answer(text.no_contractor_message, reply_markup=kb.get_yes_no_contractor_keyboard())
         await clbck.answer()
         return 
-    await clbck.message.answer('yes')
+    info = await utils.get_contractor_info(clbck.from_user.id)
+    await clbck.message.answer(info)
+    await clbck.answer()
 
 @router.callback_query(F.data == "register_contractor")
 async def register_contractor_query(clbck: CallbackQuery, state: FSMContext):

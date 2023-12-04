@@ -37,8 +37,8 @@ def get_address_from_coords(latitude, longitude):
 
 async def get_contractor_info(tg_id):
     res = await ManageDB().get_contractor_info(tg_id)
-    data = f"Пока здесь больше ничего нет :)\n<b>ID<b>: {res['id']}"
-    return res
+    data = f"Пока здесь больше ничего нет :)\n<b>ID</b>: {res['id']}"
+    return data
 
 async def register_contractor(tg_id):
     await ManageDB().register_contractor(tg_id)
