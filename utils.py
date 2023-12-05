@@ -37,8 +37,26 @@ def get_address_from_coords(latitude, longitude):
 
 async def get_contractor_info(tg_id):
     res = await ManageDB().get_contractor_info(tg_id)
-    data = f"Пока здесь больше ничего нет :)\n<b>ID</b>: {res['id']}"
+    data = f"Пока здесь больше ничего нет :)\n" +\
+        f"Имя: <b>{res['first_name']}</b>\n" +\
+        f"Фамилия: <b>{res['last_name']}</b>"
     return data
 
 async def register_contractor(tg_id):
     await ManageDB().register_contractor(tg_id)
+
+async def get_orders(tg_id):
+    res = await ManageDB().get_orders(tg_id)
+    # [<Record id=1 client_id=3 contractor_id=None amount=Decimal('1500') title='Кросовки' description='Тестовый запрос на кросовки'>]
+    if not res:
+        return "У вас пока нет заказов"
+    data = "<b>Ваши заказы:</b>\n\n"
+    for ind, elem in enumerate(res):
+        if elem['contractor_id']:
+            contractor = await get_contractor_info(tg_id)
+            contractor = contractor['first_name'] + " " + contractor['last_name']
+        else:
+            contractor = "<i>пока никто не взялся за ваш заказ</i>"
+        data += f"{ind + 1}) Заказ <b>{elem['title']}</b> стоимостью <i>{elem['amount']}</i>. " +\
+                f"Исполнитель: {contractor}\n\n"
+    return data

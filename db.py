@@ -59,13 +59,19 @@ class ManageDB:
     
     async def get_contractor_info(self, tg_id):
         async with Database() as db:
-            res = await db.fetchrow(f"SELECT contractors.* FROM contractors JOIN users ON users.id=contractors.id WHERE users.tg_id='{tg_id}'")
+            res = await db.fetchrow(f"SELECT contractors.*, users.first_name, users.last_name " +\
+                                    f"FROM contractors JOIN users ON users.id=contractors.id WHERE users.tg_id='{tg_id}'")
         return res
     
     async def register_contractor(self, tg_id):
         async with Database() as db:
             await db.execute(f"UPDATE users SET is_contractor=true WHERE tg_id='{tg_id}'")
             await db.execute(f"INSERT INTO contractors(id) VALUES((SELECT id FROM users WHERE users.tg_id='{tg_id}'))")
+
+    async def get_orders(self, tg_id):
+        async with Database() as db:
+            res = await db.fetch(f"SELECT * FROM orders WHERE client_id=(SELECT id FROM users WHERE tg_id='{tg_id}')")
+        return res
         
 
 

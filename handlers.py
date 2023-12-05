@@ -46,6 +46,13 @@ async def show_profile_query(clbck: CallbackQuery, state: FSMContext):
     if not data:
         data = "Используйте /start"
     await clbck.message.answer(data, reply_markup=kb.get_profile_keyboard())
+    await clbck.answer()
+
+@router.callback_query(F.data == 'show_order_list')
+async def show_order_list_query(clbck: CallbackQuery, state: FSMContext):
+    data = await utils.get_orders(clbck.from_user.id)
+    await clbck.message.answer(data)
+    await clbck.answer()
 
 @router.callback_query(F.data == 'set_profile_query')
 async def change_profile_query(clbck: CallbackQuery):
@@ -104,7 +111,10 @@ async def set_email_state(msg: Message, state: FSMContext):
 
 @router.message(Gen.set_address)
 async def set_address_state(msg: Message, state: FSMContext):
-    addr = utils.get_address_from_coords(msg.location.latitude, msg.location.longitude)[0][0]['value']
+    if msg.location:
+        addr = utils.get_address_from_coords(msg.location.latitude, msg.location.longitude)[0][0]['value']
+    else:
+        addr = msg.text
     await utils.set_profile(msg.from_user.id, address=addr)
     await msg.answer(f'Адрес доставки изменен на {addr}', reply_markup=ReplyKeyboardRemove())
     await state.clear()
@@ -138,6 +148,6 @@ async def test(msg: Message, state: FSMContext):
 
 @router.message()
 async def message_handler(msg: Message):
-    print(msg.from_user.id)
+    print(msg.text)
     await msg.answer(f"Неизвестная команда.\nИспользуйте /help для просмотра списка команд.")
 
