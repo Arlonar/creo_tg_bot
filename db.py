@@ -40,6 +40,7 @@ class Database:
 
 
 class ManageDB:
+    # status = ('canceled', 'waiting', 'in_progress', 'done')
     async def get_profile_info(self, tg_id):
         async with Database() as db:
             res = await db.fetchrow(f"SELECT * FROM users WHERE tg_id = '{tg_id}'")
@@ -68,12 +69,40 @@ class ManageDB:
             await db.execute(f"UPDATE users SET is_contractor=true WHERE tg_id='{tg_id}'")
             await db.execute(f"INSERT INTO contractors(id) VALUES((SELECT id FROM users WHERE users.tg_id='{tg_id}'))")
 
-    async def get_orders(self, tg_id):
+    async def get_history(self, tg_id):
         async with Database() as db:
-            res = await db.fetch(f"SELECT * FROM orders WHERE client_id=(SELECT id FROM users WHERE tg_id='{tg_id}')")
+            res = await db.fetch(f"SELECT orders.*, users.first_name, users.last_name, users.tg_id \
+                                    FROM orders LEFT JOIN contractors ON contractors.id=orders.contractor_id \
+                                    LEFT JOIN users ON users.id=contractors.id \
+                                    WHERE client_id=(SELECT id FROM users WHERE tg_id='{tg_id}') \
+                                    AND (orders.status='done' OR orders.status='canceled') ORDER BY orders.id")
         return res
-        
+    
+    async def get_actual_orders(self, tg_id):
+        async with Database() as db:
+            res = await db.fetch(f"SELECT orders.*, users.first_name, users.last_name, users.tg_id \
+                                    FROM orders LEFT JOIN contractors ON contractors.id=orders.contractor_id \
+                                    LEFT JOIN users ON users.id=contractors.id \
+                                    WHERE client_id=(SELECT id FROM users WHERE tg_id='{tg_id}') \
+                                    AND (orders.status='in_progress' OR orders.status='waiting') ORDER BY orders.id")
+        return res
+    
+    async def get_order_by_id(self, id):
+        async with Database() as db:
+            res = await db.fetchrow(f"SELECT orders.*, users.first_name, users.last_name, users.tg_id\
+                                     FROM orders LEFT JOIN contractors ON contractors.id=orders.contractor_id LEFT JOIN users ON users.id=contractors.id\
+                                     WHERE orders.id={id};")
+        return res
 
+    async def add_order(self, tg_id, amount, title, description):
+        async with Database() as db:
+            await db.execute(f"INSERT INTO orders(client_id, amount, title, description) " +\
+                                f"VALUES((SELECT id FROM users WHERE users.tg_id='{tg_id}'), {amount}, '{title}', '{description}')")
+    
+    async def delete_order(self, order_id):
+        async with Database() as db:
+            await db.execute(f"UPDATE orders SET status='done' WHERE id={order_id}")
+            await db.execute(f"INSERT INTO refund_requests(order_id) VALUES({order_id})")
 
 
 

@@ -1,12 +1,14 @@
 from aiogram.fsm.state import StatesGroup, State
 
 class Gen(StatesGroup):
-    set_first_name = State()
-    set_last_name = State()
-    set_gender = State()
-    set_email = State()
-    set_address = State()
-    set_phone = State()
+    profile_set_first_name = State()
+    profile_set_last_name = State()
+    profile_set_gender = State()
+    profile_set_email = State()
+    profile_set_address = State()
+    profile_set_phone = State()
 
-    change_profile = State()
-    register_contractor = State()
+    order_set_title = State()
+    order_set_description = State()
+    order_set_amount = State()
+    
