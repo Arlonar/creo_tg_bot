@@ -80,7 +80,7 @@ class ManageDB:
     
     async def get_actual_orders(self, tg_id):
         async with Database() as db:
-            res = await db.fetch(f"SELECT orders.*, users.first_name, users.last_name, users.tg_id \
+            res = await db.fetch(f"SELECT orders.*, users.tg_id, users.first_name, users.last_name \
                                     FROM orders LEFT JOIN contractors ON contractors.id=orders.contractor_id \
                                     LEFT JOIN users ON users.id=contractors.id \
                                     WHERE client_id=(SELECT id FROM users WHERE tg_id='{tg_id}') \
@@ -101,7 +101,7 @@ class ManageDB:
     
     async def delete_order(self, order_id):
         async with Database() as db:
-            await db.execute(f"UPDATE orders SET status='done' WHERE id={order_id}")
+            await db.execute(f"UPDATE orders SET status='canceled' WHERE id={order_id}")
             await db.execute(f"INSERT INTO refund_requests(order_id) VALUES({order_id})")
 
 

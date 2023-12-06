@@ -2,6 +2,7 @@ from db import ManageDB
 import text
 from dadata import Dadata
 from config import DADATA_API_KEY
+from aiogram.types import User
 
 
 async def register(tg_id):
@@ -49,7 +50,7 @@ async def get_contractor_info(tg_id):
 async def register_contractor(tg_id):
     await ManageDB().register_contractor(tg_id)
 
-async def get_orders(tg_id):
+async def get_orders(tg_id,):
     res = await ManageDB().get_actual_orders(tg_id)
     # [<Record id=1 client_id=3 contractor_id=None amount=Decimal('1500') title='Кросовки' description='Тестовый запрос на кросовки'>]
     if not res:
@@ -70,7 +71,7 @@ async def get_history(tg_id):
     if not res:
         return 'Вы еще ничего не заказывали, либо заказы не незаврешены'
     for ind, elem in enumerate(res):
-        data += f"{ind + 1}) Заказ <b>{elem['title']}</b> {'завершен' if elem['status'] == 'done' else 'отменен'}"
+        data += f"{ind + 1}) Заказ <b>{elem['title']}</b> {'завершен' if elem['status'] == 'done' else 'отменен'}\n"
     return data
 
 async def get_order(order_id):
