@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher, F
-from aiogram.types import Message, LabeledPrice, PreCheckoutQuery
+from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, FSInputFile
 from aiogram.types.callback_query import CallbackQuery
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -22,8 +22,7 @@ async def add_new_order(clbck: CallbackQuery, state: FSMContext):
         return
     if not data.get('amount'):
         await clbck.message.answer("Заполните сумму заказа!")
-        return
-    
+        return    
     title = data['title']
     amount = int(data['amount'] * 100)
 
@@ -33,21 +32,26 @@ async def add_new_order(clbck: CallbackQuery, state: FSMContext):
 async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
+@router.message(Command('buy'))
+async def test(msg: Message):
+    await send_buy_query(msg.chat.id, "проверОЧКА", [LabeledPrice(label='Плати давай', amount=10000)])
+
 @router.message()
 async def message_handler(msg: Message):
     print(msg.text)
     await msg.answer(f"Используйте /menu для взаимодействия")
 
 async def send_buy_query(chat_id, title, prices):
+    photo = FSInputFile('creo_logo.jpg')
     await bot.send_invoice(chat_id,
                            title=title,
                            description="Оплата заказа",
                            provider_token=config.PAYMENT_TOKEN,
                            currency="rub",
-                           photo_url="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                           photo_width=570,
-                           photo_height=713,
-                           photo_size=713,
+                           photo_url="https://downloader.disk.yandex.ru/preview/fc51d80ab9bbcefd22c44f2c29d636c3ed8ff185bf23af16e9f0f45c945a2bf8/65724c61/CT7fSOuhLp4fkouLX2ybj_nVEXnmya_AKe807xew9nWjMbT_A-L_o_NZstv04U1NxOB2qzWgCbCFa5uQOMSUlQ%3D%3D?uid=0&filename=creo_logo.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v2&size=1850x963",
+                           photo_width=250,
+                           photo_height=250,
+                           photo_size=250,
                            is_flexible=False,
                            prices=prices,
                            start_parameter="one-month-subscription",

@@ -1,6 +1,7 @@
 from aiogram import Router, F, types, flags, html
+from aiogram.methods.send_invoice import SendInvoice
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, LabeledPrice
 from aiogram.types.callback_query import CallbackQuery
 from aiogram.filters import Command
 
@@ -9,6 +10,7 @@ from callback_data import ChangeProfile
 import utils
 import kb
 import text
+import config
 
 
 router = Router()
@@ -207,7 +209,7 @@ async def delete_order_query(clbck: CallbackQuery):
 async def successfull_paymeny_query(msg: Message, state: FSMContext):
     data = await state.get_data()
     title = data['title']
-    description = data['description']
+    description = data.get('description', '')
     amount = data['amount']
     await utils.add_order(msg.from_user.id, amount, title, description)
     await msg.answer(f"Платеж по заказу <b>{title}</b> на сумму <i>{amount} RUB </i> " +\
