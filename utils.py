@@ -47,12 +47,15 @@ async def get_contractor_info(tg_id):
         f"Фамилия: <b>{res['last_name']}</b>"
     return data
 
+async def get_contractors():
+    res = await ManageDB().get_notify_contractors_ids()
+    return res
+
 async def register_contractor(tg_id):
     await ManageDB().register_contractor(tg_id)
 
 async def get_orders(tg_id,):
     res = await ManageDB().get_actual_orders(tg_id)
-    # [<Record id=1 client_id=3 contractor_id=None amount=Decimal('1500') title='Кросовки' description='Тестовый запрос на кросовки'>]
     if not res:
         return "У вас пока нет заказов"
     data = "<b>Текущие заказы:</b>\n\n"

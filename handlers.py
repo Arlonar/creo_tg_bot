@@ -205,18 +205,6 @@ async def delete_order_query(clbck: CallbackQuery):
     await clbck.message.answer(text.success_delete_order)
     await clbck.answer()
 
-@router.message(F.successful_payment)
-async def successfull_paymeny_query(msg: Message, state: FSMContext):
-    data = await state.get_data()
-    title = data['title']
-    description = data.get('description', '')
-    amount = data['amount']
-    await utils.add_order(msg.from_user.id, amount, title, description)
-    await msg.answer(f"Платеж по заказу <b>{title}</b> на сумму <i>{amount} RUB </i> " +\
-                     f"прошел успешно!\n\nВаш заказ был опубликован. Ожидайте пока художник возьмется за его работу")
-    await state.clear()
-    # Здесь должно быть уведомление о заказе всем художникам, подписанным на уведомления
-
 
 
 

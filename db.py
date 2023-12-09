@@ -60,8 +60,13 @@ class ManageDB:
     
     async def get_contractor_info(self, tg_id):
         async with Database() as db:
-            res = await db.fetchrow(f"SELECT contractors.*, users.first_name, users.last_name " +\
-                                    f"FROM contractors JOIN users ON users.id=contractors.id WHERE users.tg_id='{tg_id}'")
+            res = await db.fetchrow((f"SELECT contractors.*, users.first_name, users.last_name "
+                                    f"FROM contractors JOIN users ON users.id=contractors.id WHERE users.tg_id='{tg_id}'"))
+        return res
+
+    async def get_notify_contractors_ids(self):
+        async with Database() as db:
+            res = await db.fetch(f"SELECT users.tg_id FROM contractors JOIN users ON users.id=contractors.id WHERE contractors.notification=true")
         return res
     
     async def register_contractor(self, tg_id):

@@ -32,9 +32,21 @@ async def add_new_order(clbck: CallbackQuery, state: FSMContext):
 async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
-@router.message(Command('buy'))
-async def test(msg: Message):
-    await send_buy_query(msg.chat.id, "проверОЧКА", [LabeledPrice(label='Плати давай', amount=10000)])
+@router.message(F.successful_payment)
+async def successfull_paymeny_query(msg: Message, state: FSMContext):
+    data = await state.get_data()
+    title = data['title']
+    description = data.get('description', '')
+    amount = data['amount']
+    await utils.add_order(msg.from_user.id, amount, title, description)
+    await msg.answer(f"Платеж по заказу <b>{title}</b> на сумму <i>{amount} RUB </i> " +\
+                     f"прошел успешно!\n\nВаш заказ был опубликован. Ожидайте пока художник возьмется за его работу")
+    await state.clear()
+
+    contractors = await utils.get_contractors()
+    for contractor in contractors:
+        if contractor['tg_id'] != msg.from_user.id:
+            await bot.send_message(chat_id=contractor['tg_id'], text='Появился новый заказ!\n\n')
 
 @router.message()
 async def message_handler(msg: Message):
