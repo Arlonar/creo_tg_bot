@@ -11,6 +11,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 import config
 import utils
+import kb
 from handlers import router
 
 
@@ -33,7 +34,7 @@ async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
 @router.message(F.successful_payment)
-async def successfull_paymeny_query(msg: Message, state: FSMContext):
+async def successfull_payment_query(msg: Message, state: FSMContext):
     data = await state.get_data()
     title = data['title']
     description = data.get('description', '')
@@ -45,8 +46,10 @@ async def successfull_paymeny_query(msg: Message, state: FSMContext):
 
     contractors = await utils.get_contractors()
     for contractor in contractors:
-        if contractor['tg_id'] != msg.from_user.id:
-            await bot.send_message(chat_id=contractor['tg_id'], text='Появился новый заказ!\n\n')
+        if int(contractor['tg_id']) != msg.from_user.id:
+            order_id = await utils.get_order_id(title, description, amount, msg.from_user.id)
+            data = await utils.get_order_info_for_contractor(by_id=False, title=title, description=description, amount=amount)
+            await bot.send_message(chat_id=contractor['tg_id'], text=f'Появился новый заказ!\n\n{data}', reply_markup=kb.get_respond_order_keyboard(order_id))
 
 @router.message()
 async def message_handler(msg: Message):

@@ -108,6 +108,17 @@ class ManageDB:
         async with Database() as db:
             await db.execute(f"UPDATE orders SET status='canceled' WHERE id={order_id}")
             await db.execute(f"INSERT INTO refund_requests(order_id) VALUES({order_id})")
+        
+    async def get_order_id_by_data(self, title, description, amount, client_id):
+        async with Database() as db:
+            id = await db.fetchrow(f"SELECT id FROM orders WHERE title='{title}' AND description='{description}' AND amount='{amount}'"
+                                   f"AND client_id=(SELECT id FROM users WHERE tg_id='{client_id}')")
+        return id
+        
+    async def set_contractor_for_order(self, order_id, contractor_tg_id):
+        async with Database() as db:
+            print(f"UPDATE orders SET contractor_id=(SELECT id FROM users WHERE tg_id='{contractor_tg_id}') WHERE id={order_id}")
+            await db.execute(f"UPDATE orders SET status='in_progress', contractor_id=(SELECT id FROM users WHERE tg_id='{contractor_tg_id}') WHERE id={order_id}")
 
 
 

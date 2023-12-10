@@ -205,6 +205,14 @@ async def delete_order_query(clbck: CallbackQuery):
     await clbck.message.answer(text.success_delete_order)
     await clbck.answer()
 
+@router.callback_query(F.data.startswith("respond_order_"))
+async def respond_order_query(clbck: CallbackQuery):
+    id = clbck.data.split('_')[2]
+    await utils.set_contractor_for_order(id, clbck.from_user.id)
+    await clbck.message.answer('Вы взялись за этот заказ!')
+    await clbck.answer()
+    # Сделать уведомление клиенту о том, что откликнулся художник
+
 
 
 

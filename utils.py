@@ -1,7 +1,7 @@
 from db import ManageDB
 import text
 from dadata import Dadata
-from config import DADATA_API_KEY
+from config import DADATA_API_KEY, PROCENT_FROM_SALES
 from aiogram.types import User
 
 
@@ -42,9 +42,8 @@ def get_address_from_coords(latitude, longitude):
 
 async def get_contractor_info(tg_id):
     res = await ManageDB().get_contractor_info(tg_id)
-    data = f"Пока здесь больше ничего нет :)\n" +\
-        f"Имя: <b>{res['first_name']}</b>\n" +\
-        f"Фамилия: <b>{res['last_name']}</b>"
+    data = (f"<b>Уведомления</b>: <i>{'включены' if res['notification'] == 't' else 'отключены'}</i>"
+            f"<b>Информация о себе</b>: {res['about']}")
     return data
 
 async def get_contractors():
@@ -106,3 +105,18 @@ async def delete_order(order_id) -> bool:
         return False
     await db.delete_order(order_id)
     return True
+
+async def get_order_info_for_contractor(by_id : bool, order_id=0, title='', description='', amount=0):
+    if by_id:
+        info = await ManageDB().get_order_by_id(order_id)
+    else:
+        info = {'title': title, 'description': description, 'amount': amount}
+    data = f"Заказ <b>{info['title']}</b>\n\nОписание заказа: <i>{info['description']}</i>\n\nСумма заказа: <i>{(float(info['amount']) * PROCENT_FROM_SALES):.2f} RUB</i>\n\n"
+    return data
+
+async def get_order_id(title, description, amount, client_id):
+    id = await ManageDB().get_order_id_by_data(title=title, description=description, amount=amount, client_id=client_id)
+    return id['id']
+
+async def set_contractor_for_order(order_id, contractor_tg_id):
+    await ManageDB().set_contractor_for_order(order_id, contractor_tg_id)

@@ -96,3 +96,11 @@ def get_info_order_keyboard(id, is_order : bool = True) -> InlineKeyboardMarkup:
         builder.button(text=text.back_button_text, callback_data=f"show_history_list")
     builder.adjust(1)
     return builder.as_markup()
+
+def get_respond_order_keyboard(order_id) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Взяться", callback_data=f"respond_order_{order_id}"),
+            InlineKeyboardButton(text="Отказаться", callback_data="show_menu")
+        ]
+    ])
